@@ -82,7 +82,9 @@ class PortaNuova
 	def parse(statement)
 		if statement =~ @line_pattern
 			line, station = $1.to_i, $2
-			if line == 2 && station.start_with?('Italia \'')
+			if line == 1 && station.start_with?('Italia \'')
+				@italia61_value = to_num station[(station.index('\'') + 1)..-1]
+				puts "Italia '61 value is #{@italia61_value}" if $DEBUG
 				station = 'Italia \'61'
 			end
 			if LINES[line].include? station
@@ -117,11 +119,12 @@ class PortaNuova
 			when 'Collegno Centro'
 			when 'Certosa'
 			when 'Fermi' # print data from station referenced in Bengasi
-				puts @station_data[@station_data['Bengasi']]
+				print @station_data[@station_data['Bengasi']]
 			when 'Paradiso'
 			when 'Marche' # set backpack value to last station data
 				@backpack[0] = @station_data[interchange?(@last_station) ? @station_data[@last_station] : @last_station]
-			when 'Massaua'
+			when 'Massaua' # writes backpack in Bengasi referenced station
+				@station_data[@station_data['Bengasi']] = @backpack[0]
 			when 'Pozzo Strada' # decrement backpack value
 				@backpack[0] = to_num(@backpack[0]) - 1
 			when 'Monte Grappa'
@@ -129,27 +132,31 @@ class PortaNuova
 				@station_data[station] = to_num(@backpack[0]) + to_num(@backpack[1])
 			when 'Racconigi' # subtract the backpack values and store result in station data
 				@station_data[station] = to_num(@backpack[0]) - to_num(@backpack[1])
-			when 'Bernini'
+			when 'Bernini' # converts backpack Integer value to Character and appends it to second value, then reverses backpack values
+				@backpack[0] = @backpack[1].to_s + @backpack[0].chr.to_s
+				@backpack.reverse!
 			when 'Principi d\'Acaja'
 			when 'XVIII Dicembre' # set backpack value to 18
 				@backpack[0] = 18
 			when 'Porta Susa'
-			when 'Vinzaglio'
+			when 'Vinzaglio' # reverse value in backpack
+				@backpack[0].reverse!
 			when 'Re Umberto'
 			when 'Marconi' # prints last visited station data
-				puts @station_data[interchange?(@last_station) ? @station_data[@last_station] : @last_station]
+				print @station_data[interchange?(@last_station) ? @station_data[@last_station] : @last_station]
 			when 'Nizza' # take the max backpack value and store result in station data
 				@station_data[station] = @backpack.map { |x| Integer(x) rescue nil }.compact.max
 			when 'Dante'
-				puts @backpack[0]
+				print @backpack[0]
 			when 'Carducci-Molinette' # reset backpack value to zero
 				@backpack[0] = 0
 			when 'Spezia' # take the min backpack value and store result in station data
 				@station_data[station] = @backpack.map { |x| Integer(x) rescue nil }.compact.min
 			when 'Lingotto' # increment backpack value
 				@backpack[0] = to_num(@backpack[0]) + 1
-			when 'Italia \'61' # writes backpack in Bengasi referenced station
-				@station_data[@station_data['Bengasi']] = @backpack[0]
+			when 'Italia \'61' # put italia '61 special value into backpack
+				@backpack[0] = @italia61_value
+				@station_data[station] = @italia61_value
 			when 'Bengasi' # station reference parking station
 				@station_data[station] = (interchange? station) ? @station_data[@last_station] : @last_station
 
@@ -176,7 +183,8 @@ class PortaNuova
 				@station_data[interchange?(@last_station) ? @station_data[@last_station] : @last_station] = @backpack[0]
 			when 'Politecnico' # converts backpack Integer value to Character
 				@backpack[0] = @backpack[0].chr
-			when 'Caboto'
+			when 'Caboto' # prints new line
+				puts
 			when 'Largo Orbassano'
 			when 'Gessi'
 			when 'Santa Rita'
@@ -187,11 +195,12 @@ class PortaNuova
 				@backpack[0] = @backpack[0].to_s
 			when 'Cattaneo' # converts backpack Character value to Integer
 				@backpack[0] = @backpack[0].ord
-			when 'Mirafiori' # append last station data to backpack value
-				@backpack[0] = @station_data[@last_station].to_s + @backpack[0].to_s
+			when 'Mirafiori' # append first backpack value to second one
+				@backpack[0] = @backpack[1].to_s + @backpack[0].to_s
 			when 'Cimitero Parco' # reset backpack value as null value
 				@backpack[0] = nil
-			when 'Fornaci'
+			when 'Fornaci' # append last station data to backpack value
+				@backpack[0] = @backpack[0].to_s + @station_data[@last_station].to_s
 			when 'Beinasco Centro'
 			when 'Orbassano Centro'
 			when 'Pasta di Rivalta'
