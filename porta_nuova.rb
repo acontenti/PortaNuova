@@ -62,6 +62,9 @@ class PortaNuova
 			'Rebaudengo'
 		]
 	}
+	LINE_PATTERN = /(?:prendi la linea) ([12]) (?:fino a) ([0-9A-Za-z.'\- ]+)/i
+	SHORTCUT_PATTERN = /(?:prendi la scorciatoia) (\w+)(?: con ([0-9]+))?/i
+	SHORTCUT_DEFINITION_PATTERN = /(?:per prendere la scorciatoia) (\w+)(?: con un (\w+))?/i
 
 	def initialize(source)
 		setup
@@ -73,23 +76,57 @@ class PortaNuova
 	def setup
 		@last_station = 'Porta Nuova'
 		@last_line = 1
-		@line_pattern = /(?:prendi la linea|take line) ([12]) (?:fino a|to) ([0-9A-Za-z.'\- ]+)/i
+		@shortcuts = {}
+		@defining = false
 		@backpack = [0, '']
 		@station_data = Hash[LINES.values.flatten.map { |key| [key, nil] }]
 		@station_data['Porta Nuova'] = 'Porta Nuova'
 	end
 
 	def parse(statement)
-		if statement =~ @line_pattern
-			line, station = $1.to_i, $2
-			if line == 1 && station.start_with?('Italia \'')
-				@italia61_value = to_num station[(station.index('\'') + 1)..-1]
-				puts "Italia '61 value is #{@italia61_value}" if $DEBUG
-				station = 'Italia \'61'
+		if @defining
+			parse_shortcut_definition(statement)
+		else
+			if statement.empty? || statement.start_with?('//')
+			elsif statement.start_with? 'prendi la linea'
+				parse_line(statement, nil)
+			elsif statement.start_with? 'prendi la scorciatoia'
+				parse_shortcut(statement, nil)
+			elsif statement.start_with? 'per prendere la scorciatoia'
+				if statement =~ SHORTCUT_DEFINITION_PATTERN
+					@defining = true
+					@current_shortcut = $1
+					@shortcuts[@current_shortcut] = {
+						parameter: ($2 != nil ? Parameter.new($2) : nil),
+						statements: []
+					}
+				end
+			else
+				throw "Sorry, cannot undarstand '#{statement}'"
 			end
+		end
+	end
+
+	def parse_shortcut_definition(statement)
+		if statement.empty? || statement.start_with?('//')
+		elsif statement.start_with?('prendi la linea') || statement.start_with?('prendi la scorciatoia')
+			if statement =~ LINE_PATTERN || statement =~ SHORTCUT_PATTERN
+				@shortcuts[@current_shortcut][:statements] << statement
+			end
+		elsif statement == 'sei arrivato'
+			@defining = false
+		else
+			throw "Sorry, cannot undarstand '#{statement}'"
+		end
+	end
+
+	def parse_line(statement, parameter)
+		if statement =~ LINE_PATTERN
+			line, station = $1.to_i, $2
+			station = italia61?(line, station, parameter)
 			if LINES[line].include? station
 				if line != @last_line
-					puts "Changing from line #{@last_line} to line #{line}" if $DEBUG
+					puts "\nChanging from line #{@last_line} to line #{line}" if $DEBUG
 					if LINES[line].include? @last_station
 						execute line, station
 					else
@@ -103,6 +140,49 @@ class PortaNuova
 			end
 		else
 			throw "Sorry, cannot undarstand '#{statement}'"
+		end
+	end
+
+	def parse_shortcut(statement, parameter)
+		if statement =~ SHORTCUT_PATTERN
+			name = $1
+			if @shortcuts.include? name
+				@shortcuts[name][:statements].each { |x|
+					parameter = if parameter != nil
+									parameter
+								else
+									@shortcuts[name][:parameter]
+								end
+					if $2 != nil
+						parameter.value = to_num $2
+					end
+					if x.start_with? 'prendi la linea'
+						parse_line(x, parameter)
+					elsif x.start_with? 'prendi la scorciatoia'
+						parse_shortcut(x, parameter)
+					else
+						throw "Sorry, cannot undarstand '#{statement}'"
+					end
+				}
+			else
+				throw "There is no shortcut called #{name}"
+			end
+		else
+			throw "Sorry, cannot undarstand '#{statement}'"
+		end
+	end
+
+	def italia61?(line, station, parameter)
+		if line == 1 && station.start_with?('Italia \'')
+			@italia61_value = station[(station.index('\'') + 1)..-1]
+			if parameter != nil && @italia61_value == parameter.name
+				@italia61_value = to_num parameter.value
+			end
+			# noinspection RubyResolve
+			puts "Italia '61 value is #{@italia61_value}" if $DEBUG
+			'Italia \'61'
+		else
+			station
 		end
 	end
 
@@ -222,6 +302,14 @@ class PortaNuova
 
 	def interchange?(station)
 		station == 'Porta Nuova'
+	end
+end
+
+class Parameter
+	attr_accessor :name, :value
+
+	def initialize(name)
+		@name = name
 	end
 end
 

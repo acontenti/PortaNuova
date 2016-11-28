@@ -32,7 +32,7 @@
 'Beinasco Centro',
 'Fornaci',
 'Cimitero Parco',
-'Fiat Mirafiori',
+'Mirafiori',
 'Cattaneo',
 'Omero',
 'Pitagora',
