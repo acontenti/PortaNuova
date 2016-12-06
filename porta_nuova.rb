@@ -193,7 +193,7 @@ class PortaNuova
 		case station
 			#line 1
 			when 'Cascine Vica' # station reference parking station
-				@station_data[station] = interchange?(@last_station) ? @station_data[@last_station] : @last_station
+				@station_data[station] = get_last_station
 			when 'Leumann' # writes backpack in Cascine Vica referenced station
 				@station_data[@station_data['Cascine Vica']] = @backpack[0]
 			when 'Collegno Centro'
@@ -202,7 +202,7 @@ class PortaNuova
 				print @station_data[@station_data['Bengasi']]
 			when 'Paradiso'
 			when 'Marche' # set backpack value to last station data
-				@backpack[0] = @station_data[interchange?(@last_station) ? @station_data[@last_station] : @last_station]
+				@backpack[0] = @station_data[get_last_station]
 			when 'Massaua' # writes backpack in Bengasi referenced station
 				@station_data[@station_data['Bengasi']] = @backpack[0]
 			when 'Pozzo Strada' # decrement backpack value
@@ -218,12 +218,13 @@ class PortaNuova
 			when 'Principi d\'Acaja'
 			when 'XVIII Dicembre' # set backpack value to 18
 				@backpack[0] = 18
-			when 'Porta Susa'
+			when 'Porta Susa' # puts new value in backpack with last station data
+				@backpack[@backpack.size] = @station_data[get_last_station]
 			when 'Vinzaglio' # reverse value in backpack
 				@backpack[0].reverse!
 			when 'Re Umberto'
 			when 'Marconi' # prints last visited station data
-				print @station_data[interchange?(@last_station) ? @station_data[@last_station] : @last_station]
+				print @station_data[get_last_station]
 			when 'Nizza' # take the max backpack value and store result in station data
 				@station_data[station] = @backpack.map { |x| Integer(x) rescue nil }.compact.max
 			when 'Dante'
@@ -238,10 +239,11 @@ class PortaNuova
 				@backpack[0] = @italia61_value
 				@station_data[station] = @italia61_value
 			when 'Bengasi' # station reference parking station
-				@station_data[station] = (interchange? station) ? @station_data[@last_station] : @last_station
+				@station_data[station] = get_last_station
 
 			#line 2
-			when 'Rebaudengo'
+			when 'Rebaudengo' # removes last value from the backpack and writes in station data if backpack has more than 2 values
+				@station_data[station] = @backpack.pop if @backpack.size > 2
 			when 'Vercelli' # multiply the backpack values and store result in station data
 				@station_data[station] = to_num(@backpack[0]) * to_num(@backpack[1])
 			when 'Giulio Cesare'
@@ -260,7 +262,7 @@ class PortaNuova
 			when 'Solferino' # swap backpack values
 				@backpack.reverse!
 			when 'Stati Uniti' # set last station data to backpack value
-				@station_data[interchange?(@last_station) ? @station_data[@last_station] : @last_station] = @backpack[0]
+				@station_data[get_last_station] = @backpack[0]
 			when 'Politecnico' # converts backpack Integer value to Character
 				@backpack[0] = @backpack[0].chr
 			when 'Caboto' # prints new line
@@ -294,6 +296,10 @@ class PortaNuova
 		@last_station = station
 		puts "\t\tBackpack contains #{@backpack.join(' and ')}" if $DEBUG
 		puts "\t\tStation contains #{@station_data[station]}" if $DEBUG
+	end
+
+	def get_last_station
+		(interchange? @last_station) ? @station_data[@last_station] : @last_station
 	end
 
 	def to_num(value)

@@ -1,14 +1,27 @@
 # Porta Nuova
 
-Esoteric programming laguage inspired by __"Mornington Crescent"__ language set in __Turin Metro__
+Esoteric programming laguage inspired by **_"Mornington Crescent"_** language set in **Turin Metro**
 
-It is named after ___Porta Nuova___ station, which is the fulcrum of Turin Metro
+It is named after **_Porta Nuova_** station, which is the fulcrum of Turin Metro
 
-## Lines
+## Rules
 
-There are two lines: `1` and `2`
+In **Porta Nuova** you travel around **stations** in Turin Metro.  
+You travel with a **backpack** that can hold values.  
+Each **station** has a value and performs some action on **backpack** values and/or **station** value.  
+**Stations** are on different **lines** and you can only change in **interchange stations**.  
 
-### Line 1
+### Backpack
+
+Initially the **backpack** holds two values `0` and `''` (empty string).  
+The number of values can change in some **stations** like `Porta Susa` and `Rebaudengo`.  
+
+### Lines
+
+There are two lines: `1` and `2`.  
+You can change in `Porta Nuova` **station**.  
+
+#### Line 1
 
 - `Cascine Vica`
 - `Leumann`
@@ -38,7 +51,7 @@ There are two lines: `1` and `2`
 - `Italia '61`
 - `Bengasi`
 
-### Line 2
+#### Line 2
 
 - `Pasta di Rivalta`
 - `Orbassano Centro`
@@ -72,6 +85,25 @@ There are two lines: `1` and `2`
 - `Giulio Cesare`
 - `Vercelli`
 - `Rebaudengo`
+
+### Shortcuts
+
+**Shortcuts** can have a **parameter**, but it is optional.  
+
+You can define a **shortcut** this way:
+```
+per prendere la scorciatoia <name> [con un <parameter name>]
+...
+<directions>
+...
+sei arrivato
+```
+You can take a **shortcut** this way:
+```
+prendi la scorciatoia <name> [con <value>]
+```
+Of course if the **shortcuts** needs a **parameter** you have to give it a value.  
+
 
 ## Copyright
 

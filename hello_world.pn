@@ -5,6 +5,15 @@ prendi la linea 1 fino a Italia 'value
 prendi la linea 1 fino a Bernini
 sei arrivato
 
+per prendere la scorciatoia write
+prendi la linea 1 fino a Porta Nuova
+prendi la linea 2 fino a Solferino
+prendi la linea 2 fino a Porta Nuova
+prendi la linea 1 fino a Dante
+prendi la linea 1 fino a Porta Nuova
+prendi la linea 2 fino a Caboto
+sei arrivato
+
 prendi la scorciatoia print con 72
 prendi la scorciatoia print con 101
 prendi la scorciatoia print con 108
@@ -18,10 +27,4 @@ prendi la scorciatoia print con 114
 prendi la scorciatoia print con 108
 prendi la scorciatoia print con 100
 prendi la scorciatoia print con 33
-prendi la linea 1 fino a Porta Nuova
-prendi la linea 2 fino a Solferino
-prendi la linea 2 fino a Porta Nuova
-prendi la linea 1 fino a Dante
-prendi la linea 1 fino a Porta Nuova
-prendi la linea 2 fino a Caboto
-
+prendi la scorciatoia write
