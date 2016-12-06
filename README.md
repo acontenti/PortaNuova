@@ -86,6 +86,15 @@ You can change in `Porta Nuova` **station**.
 - `Vercelli`
 - `Rebaudengo`
 
+### Directions
+
+**Directions** indicate where to go.  
+You have to specify **line** and **station**.  
+You can give **directions** this way:
+```
+prendi la linea <line> fino a <station>
+```
+
 ### Shortcuts
 
 **Shortcuts** can have a **parameter**, but it is optional.  
@@ -102,7 +111,7 @@ You can take a **shortcut** this way:
 ```
 prendi la scorciatoia <name> [con <value>]
 ```
-Of course if the **shortcuts** needs a **parameter** you have to give it a value.  
+Of course if the **shortcut** needs a **parameter** you have to give it a value.  
 
 
 ## Copyright
