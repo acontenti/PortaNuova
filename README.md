@@ -122,9 +122,9 @@ You can take a **shortcut** this way:
 ```
 prendi la scorciatoia <name>
 ```
-Of course if the **shortcut** needs a **parameter**, you have to pass a **value**. This way:
+Of course if the **shortcut** has a **parameter**, you have to pass a **value**. This way:
 ```
-prendi la scorciatoia <name> [con <value>]
+prendi la scorciatoia <name> con <value>
 ```
 
 ## Copyright
